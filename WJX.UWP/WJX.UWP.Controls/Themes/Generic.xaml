@@ -4,11 +4,8 @@
     
     <ResourceDictionary.MergedDictionaries>
 
-        <!--ImageViewer控件-->
-        <ResourceDictionary Source="ms-appx:///WJX.UWP.Controls/ImageViewer/ImageViewer.xaml"/>
-
         <!--ImageViewer控件，以ScrollView实现-->
-        <ResourceDictionary Source="ms-appx:///WJX.UWP.Controls/ImageViewerNew/ImageViewerNew.xaml"/>
+        <ResourceDictionary Source="ms-appx:///WJX.UWP.Controls/ImageViewer/ImageViewer.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
 

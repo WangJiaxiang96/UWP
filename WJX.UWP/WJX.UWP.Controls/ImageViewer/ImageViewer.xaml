@@ -2,29 +2,41 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WJX.UWP.Controls">
-    
+
     <Style TargetType="local:ImageViewer" >
         <Setter Property="Background"
                 Value="Black"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:ImageViewer">
-                    <local:ScalableGrid x:Name="MainScalableGrid"
-                                        Background="Transparent"
-                                        Visibility="Collapsed">
-                        <Grid x:Name="BackgroundGrid"
-                              Visibility="Visible"
-                              Opacity="{TemplateBinding BackgroundOpacity}"
-                              Background="{TemplateBinding Background}"/>
-                        <Image x:Name="MainImage"
-                               Visibility="Visible"
-                               Source="{TemplateBinding Source}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               Stretch="Uniform"/>
-                    </local:ScalableGrid>
+                    <Grid>
+                        <Grid Name="BackgroundGrid"
+                              Background="{TemplateBinding Background}"
+                              Opacity="{TemplateBinding BackgroundOpacity}">
+                        </Grid>
+                        <ScrollViewer x:Name="ZoomScrollViewer"
+                                      ZoomMode="Enabled" 
+                                      Background="Transparent"
+                                      IsZoomInertiaEnabled="True"
+                                      VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalContentAlignment="Center"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalAlignment="Stretch"
+                                      HorizontalAlignment="Stretch"
+                                      MinZoomFactor="{TemplateBinding MinScaleRate}"
+                                      MaxZoomFactor="{TemplateBinding MaxScaleRate}">
+                            <ScrollViewer.Content>
+                                <Image Name="MainImage"
+                                       Source="{TemplateBinding Source}"
+                                       Visibility="Visible"
+                                       Stretch="Uniform">
+                                </Image>
+                            </ScrollViewer.Content>
+                        </ScrollViewer>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>    
+    </Style>
 </ResourceDictionary>

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("WJX.UWP.Controls")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("UWP controls library containing many controls")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Wang Jiaxiang")]
 [assembly: AssemblyProduct("WJX.UWP.Controls")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright ©Wang Jiaxiang  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

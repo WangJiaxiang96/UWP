@@ -106,12 +106,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ImageViewerNew\ImageViewerNew.cs" />
-    <Compile Include="ImageViewerNew\ImageViewerNew.Events.cs" />
     <Compile Include="ImageViewer\ImageViewer.cs" />
+    <Compile Include="ImageViewer\ImageViewer.Events.cs" />
     <Compile Include="ImageViewer\ImageViewer.Properties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScalableGrid\ScalableGrid.cs" />
     <EmbeddedResource Include="Properties\WJX.UWP.Controls.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -120,11 +118,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ImageViewerNew\ImageViewerNew.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
     <Page Include="ImageViewer\ImageViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

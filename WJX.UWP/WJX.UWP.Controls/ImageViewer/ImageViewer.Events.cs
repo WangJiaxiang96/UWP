@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
 namespace WJX.UWP.Controls
@@ -11,7 +12,7 @@ namespace WJX.UWP.Controls
     /// <summary>
     /// ImageViewer控件的事件处理
     /// </summary>
-    public partial class ImageViewerNew
+    public partial class ImageViewer
     {
         private bool _isFromOrigin1;
         private bool _isFromOrigin2;
@@ -26,23 +27,19 @@ namespace WJX.UWP.Controls
         /// </summary>
         private void _zoom_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
+            // 当缩放没有改变时退出，为了避免只有鼠标滚轮滚动时（没有配合Ctrl）触发该事件
             if (_zoom.ZoomFactor == _zoomfactor)
             {
                 return;
             }
             _zoomfactor = _zoom.ZoomFactor;
 
-            //if(e.KeyModifiers!= Windows.System.VirtualKeyModifiers.Control)
-            //{
-            //    return;
-            //}
-
             if (_img.ActualHeight * _zoom.ZoomFactor > this.ActualHeight)
             {
                 if (_isFromOrigin1)
                 {
                     _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == ManipulationModes.None ?
+                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale )?
                         ManipulationModes.TranslateY : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
 
                     _isFromOrigin1 = false;
@@ -54,10 +51,10 @@ namespace WJX.UWP.Controls
                 {
                     _zoom.ManipulationMode =
                         _zoom.ManipulationMode == ManipulationModes.TranslateY ?
-                        ManipulationModes.None : ManipulationModes.TranslateX;
+                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateX;
 
-                    _originPosition.Y = 0;
-                    _originPosition.X = 0;
+                    _translateTransform.Y = 0;
+                    _translateTransform.X = 0;
 
                     _isFromOrigin1 = true;
                 }
@@ -68,7 +65,7 @@ namespace WJX.UWP.Controls
                 if (_isFromOrigin2)
                 {
                     _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == ManipulationModes.None ?
+                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale )?
                         ManipulationModes.TranslateX : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
 
                     _isFromOrigin2 = false;
@@ -79,23 +76,49 @@ namespace WJX.UWP.Controls
                 if (!_isFromOrigin2)
                 {
                     _zoom.ManipulationMode =
-                        _img.ManipulationMode == ManipulationModes.TranslateX ?
-                        ManipulationModes.None : ManipulationModes.TranslateY;
+                        _zoom.ManipulationMode == ManipulationModes.TranslateX ?
+                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateY;
 
-                    _originPosition.X = 0;
-                    _originPosition.Y = 0;
+                    _translateTransform.X = 0;
+                    _translateTransform.Y = 0;
 
                     _isFromOrigin2 = true;
                 }
             }
-
         }
 
         private void _zoom_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            _img.RenderTransform = _originPosition;
-            _originPosition.X += e.Delta.Translation.X / _zoom.ZoomFactor;
-            _originPosition.Y += e.Delta.Translation.Y / _zoom.ZoomFactor;
+            if (_zoom.ManipulationMode.HasFlag(ManipulationModes.TranslateX))
+            {
+                double maxTranslationX = ComputeMaxTranslationValue(_img.ActualWidth, _zoom.ActualWidth, _zoom.ZoomFactor);
+
+                // 判断最终Translation是否大于最大值
+                if (Math.Abs(_translateTransform.X + e.Delta.Translation.X / _zoom.ZoomFactor) > maxTranslationX)
+                {
+                    // 直接将Translation.X定义为最大值，后面公式是为了计算向哪个方向移动
+                    _translateTransform.X = maxTranslationX * (e.Delta.Translation.X >= 0 ? 1 : -1);
+                }
+                else
+                {
+                    _translateTransform.X += e.Delta.Translation.X / _zoom.ZoomFactor;
+                }
+            }
+
+            if (_zoom.ManipulationMode.HasFlag(ManipulationModes.TranslateY))
+            {
+                double maxTranslationY = ComputeMaxTranslationValue(_img.ActualHeight, _zoom.ActualHeight, _zoom.ZoomFactor);
+                // 判断最终Translation是否大于最大值
+                if (Math.Abs(_translateTransform.Y + e.Delta.Translation.Y / _zoom.ZoomFactor) > maxTranslationY)
+                {
+                    // 直接将Translation.X定义为最大值，后面公式是为了计算向哪个方向移动
+                    _translateTransform.Y = maxTranslationY * (e.Delta.Translation.Y >= 0 ? 1 : -1);
+                }
+                else
+                {
+                    _translateTransform.Y += e.Delta.Translation.Y / _zoom.ZoomFactor;
+                }
+            }
         }
 
         /// <summary>
@@ -104,14 +127,13 @@ namespace WJX.UWP.Controls
         /// </summary>
         private void _img_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            if (_zoom.ZoomFactor != 1)
+            if (_zoom.ZoomFactor != 1f)
             {
-                _zoom.ChangeView(null, null, 1);
-                RecoverImagePosition();
+                ResetZoomFactor(e.PointerDeviceType);
             }
             else
             {
-                Hide();
+                Hide(e.PointerDeviceType);
             }
         }
 
@@ -124,13 +146,17 @@ namespace WJX.UWP.Controls
 
         private void _zoom_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Hide();
+            Hide(e.PointerDeviceType);
         }
 
         private void _img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             AjustImageSize();
-            RecoverImagePosition();
+            ResetImagePosition();
+        }
+        private void _zoom_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            _zoom_PointerWheelChanged(null, null);
         }
 
     }

@@ -1,22 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-
 
 namespace WJX.UWP.Controls
 {
-	/// <summary>
+    /// <summary>
     /// ImageViewer的DependencyProperty
     /// </summary>
     public partial class ImageViewer
     {
+
+        /// <summary>
+        /// 当前缩放倍数
+        /// </summary>
+        public float ZoomFactor
+        {
+            get
+            {
+                if (_zoom != null)
+                    return _zoom.ZoomFactor;
+                else
+                    return 1;
+            }
+            set
+            {
+                if (_zoom != null)
+                    _zoom.ChangeView(null, null, value);
+            }
+        }
+        public static readonly DependencyProperty ZoomFactorProperty =
+            DependencyProperty.Register("ZoomFactor", typeof(float), typeof(ImageViewer), new PropertyMetadata(1));
+
         /// <summary>
         /// 图片相对于整个控件的大小比率，以图片的长或宽（取最大值）为计算基准
         /// </summary>
@@ -27,18 +45,7 @@ namespace WJX.UWP.Controls
         }
         public static readonly DependencyProperty ImageSizePercentProperty =
             DependencyProperty.Register("ImageSizePercent", typeof(double), typeof(ImageViewer), new PropertyMetadata(0.6));
-
-        /// <summary>
-        /// 图片源
-        /// </summary>
-        public ImageSource Source
-        {
-            get { return (ImageSource)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
-        }
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(ImageSource), typeof(ImageViewer), new PropertyMetadata(null));
-
+     
         /// <summary>
         /// 背景透明度
         /// </summary>
@@ -53,46 +60,36 @@ namespace WJX.UWP.Controls
         /// <summary>
         /// 最大缩放倍数
         /// </summary>
-        public double MaxScaleRate
+        public float MaxScaleRate
         {
             get
             {
-                if (_scale != null)
-                    return _scale.MaxScaleRate;
-                else
-                    return (double)GetValue(MaxScaleRateProperty);
+                return (float)GetValue(MaxScaleRateProperty);
             }
             set
             {
-                if (_scale != null)
-                    _scale.MaxScaleRate = value;
                 SetValue(MaxScaleRateProperty, value);
             }
         }
         public static readonly DependencyProperty MaxScaleRateProperty =
-            DependencyProperty.Register("MaxScaleRate", typeof(double), typeof(ImageViewer), new PropertyMetadata(4));
+            DependencyProperty.Register("MaxScaleRate", typeof(float), typeof(ImageViewer), new PropertyMetadata(4));
 
         /// <summary>
         /// 最小缩放倍数
         /// </summary>
-        public double MinScaleRate
+        public float MinScaleRate
         {
             get
             {
-                if (_scale != null)
-                    return _scale.MinScaleRate;
-                else
-                    return (double)GetValue(MinScaleRateProperty);
+                return (float)GetValue(MinScaleRateProperty);
             }
             set
             {
-                if (_scale != null)
-                    _scale.MinScaleRate = value;
                 SetValue(MinScaleRateProperty, value);
             }
         }
         public static readonly DependencyProperty MinScaleRateProperty =
-            DependencyProperty.Register("MinScaleRate", typeof(double), typeof(ImageViewer), new PropertyMetadata(0.5));
+            DependencyProperty.Register("MinScaleRate", typeof(float), typeof(ImageViewer), new PropertyMetadata(0.5));
 
         /// <summary>
         /// 设置可见性
@@ -101,20 +98,31 @@ namespace WJX.UWP.Controls
         {
             get
             {
-                if (_scale != null)
-                    return _scale.Visibility;
-                else
-                    return (Visibility)GetValue(VisibilityProperty);
+                return (Visibility)GetValue(VisibilityProperty);
             }
             set
             {
-                if (_scale != null)
-                    _scale.Visibility = value;
+                if (_zoom != null)
+                    _zoom.Visibility = value;
+                if (_bg != null)
+                    _bg.Visibility = value;
+
                 SetValue(VisibilityProperty, value);
             }
         }
         public new static readonly DependencyProperty VisibilityProperty =
             DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ImageViewer), new PropertyMetadata(Visibility.Collapsed));
+
+        /// <summary>
+        /// 图片源
+        /// </summary>
+        public ImageSource Source
+        {
+            get { return (ImageSource)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source", typeof(ImageSource), typeof(ImageViewer), new PropertyMetadata(null));
 
     }
 }
