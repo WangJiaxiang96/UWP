@@ -11,6 +11,8 @@
                 <ControlTemplate TargetType="local:ImageViewer">
                     <Grid>
                         <Grid Name="BackgroundGrid"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
                               Background="{TemplateBinding Background}"
                               Opacity="{TemplateBinding BackgroundOpacity}">
                         </Grid>

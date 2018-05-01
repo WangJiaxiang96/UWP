@@ -22,71 +22,6 @@ namespace WJX.UWP.Controls
             // Todo:增加图片另存为功能
         }
 
-        /// <summary>
-        /// 根据缩放比例判断图片是否能被拖动
-        /// </summary>
-        private void _zoom_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
-        {
-            // 当缩放没有改变时退出，为了避免只有鼠标滚轮滚动时（没有配合Ctrl）触发该事件
-            if (_zoom.ZoomFactor == _zoomfactor)
-            {
-                return;
-            }
-            _zoomfactor = _zoom.ZoomFactor;
-
-            if (_img.ActualHeight * _zoom.ZoomFactor > this.ActualHeight)
-            {
-                if (_isFromOrigin1)
-                {
-                    _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale )?
-                        ManipulationModes.TranslateY : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
-
-                    _isFromOrigin1 = false;
-                }
-            }
-            else
-            {
-                if (!_isFromOrigin1)
-                {
-                    _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == ManipulationModes.TranslateY ?
-                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateX;
-
-                    _translateTransform.Y = 0;
-                    _translateTransform.X = 0;
-
-                    _isFromOrigin1 = true;
-                }
-            }
-
-            if (_img.ActualWidth * _zoom.ZoomFactor > this.ActualWidth)
-            {
-                if (_isFromOrigin2)
-                {
-                    _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale )?
-                        ManipulationModes.TranslateX : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
-
-                    _isFromOrigin2 = false;
-                }
-            }
-            else
-            {
-                if (!_isFromOrigin2)
-                {
-                    _zoom.ManipulationMode =
-                        _zoom.ManipulationMode == ManipulationModes.TranslateX ?
-                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateY;
-
-                    _translateTransform.X = 0;
-                    _translateTransform.Y = 0;
-
-                    _isFromOrigin2 = true;
-                }
-            }
-        }
-
         private void _zoom_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             if (_zoom.ManipulationMode.HasFlag(ManipulationModes.TranslateX))
@@ -129,34 +64,92 @@ namespace WJX.UWP.Controls
         {
             if (_zoom.ZoomFactor != 1f)
             {
-                ResetZoomFactor(e.PointerDeviceType);
+                ResetZoomFactor();
             }
             else
             {
-                Hide(e.PointerDeviceType);
+                Hide();
             }
         }
 
         private void _img_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //Hide();
             //处理Handled防止继续触发上一层_zoom_Tapped事件
             e.Handled = true;
         }
 
         private void _zoom_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Hide(e.PointerDeviceType);
+            Hide();
         }
 
         private void _img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            AjustImageSize();
-            ResetImagePosition();
+            //AjustImageSize();
+            //ResetImagePosition();
         }
+
+        private void ImageViewer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 根据缩放比例判断图片是否能被拖动
+        /// </summary>
         private void _zoom_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
-            _zoom_PointerWheelChanged(null, null);
+            if (_img.ActualHeight * _zoom.ZoomFactor > this.ActualHeight)
+            {
+                if (_isFromOrigin1)
+                {
+                    _zoom.ManipulationMode =
+                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale) ?
+                        ManipulationModes.TranslateY : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
+
+                    _isFromOrigin1 = false;
+                }
+            }
+            else
+            {
+                if (!_isFromOrigin1)
+                {
+                    _zoom.ManipulationMode =
+                        _zoom.ManipulationMode == ManipulationModes.TranslateY ?
+                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateX;
+
+                    _translateTransform.Y = 0;
+                    _translateTransform.X = 0;
+
+                    _isFromOrigin1 = true;
+                }
+            }
+
+            if (_img.ActualWidth * _zoom.ZoomFactor > this.ActualWidth)
+            {
+                if (_isFromOrigin2)
+                {
+                    _zoom.ManipulationMode =
+                        _zoom.ManipulationMode == (ManipulationModes.System | ManipulationModes.Scale) ?
+                        ManipulationModes.TranslateX : ManipulationModes.TranslateX | ManipulationModes.TranslateY;
+
+                    _isFromOrigin2 = false;
+                }
+            }
+            else
+            {
+                if (!_isFromOrigin2)
+                {
+                    _zoom.ManipulationMode =
+                        _zoom.ManipulationMode == ManipulationModes.TranslateX ?
+                         ManipulationModes.System | ManipulationModes.Scale : ManipulationModes.TranslateY;
+
+                    _translateTransform.X = 0;
+                    _translateTransform.Y = 0;
+
+                    _isFromOrigin2 = true;
+                }
+            }
         }
 
     }

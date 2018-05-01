@@ -13,7 +13,6 @@ namespace WJX.UWP.Controls
     /// </summary>
     public partial class ImageViewer
     {
-
         /// <summary>
         /// 当前缩放倍数
         /// </summary>
@@ -106,7 +105,11 @@ namespace WJX.UWP.Controls
                     _zoom.Visibility = value;
                 if (_bg != null)
                     _bg.Visibility = value;
-
+                if (_img != null)
+                {
+                    AjustImageSize();
+                    ResetImagePosition();
+                }
                 SetValue(VisibilityProperty, value);
             }
         }
@@ -119,7 +122,15 @@ namespace WJX.UWP.Controls
         public ImageSource Source
         {
             get { return (ImageSource)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            set
+            {
+                SetValue(SourceProperty, value);
+                //if (_img != null)
+                //{
+                //    AjustImageSize();
+                //    ResetImagePosition();
+                //}
+            }
         }
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register("Source", typeof(ImageSource), typeof(ImageViewer), new PropertyMetadata(null));

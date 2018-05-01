@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Input;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -48,7 +49,6 @@ namespace WJX.UWP.Controls
             {
                 _zoom.Tapped -= _zoom_Tapped;
                 _zoom.ManipulationDelta -= _zoom_ManipulationDelta;
-                _zoom.PointerWheelChanged -= _zoom_PointerWheelChanged;
                 _zoom.ViewChanged -= _zoom_ViewChanged;
             }
 
@@ -76,21 +76,34 @@ namespace WJX.UWP.Controls
             {
                 _zoom.Tapped += _zoom_Tapped;
                 _zoom.ManipulationDelta += _zoom_ManipulationDelta;
-                _zoom.PointerWheelChanged += _zoom_PointerWheelChanged;
                 _zoom.ViewChanged += _zoom_ViewChanged;
             }
 
             _zoomfactor = 1f;
             this.Visibility = Visibility.Collapsed;
+                        
+            this.SizeChanged += ImageViewer_SizeChanged;
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (_img != null)
+            {
+                AjustImageSize();
+                ResetImagePosition();
+            }
+
+            return base.MeasureOverride(availableSize);
         }
 
         public void Show()
         {
             this.Visibility = Visibility.Visible;
         }
-        public void Hide(PointerDeviceType pointer)
+
+        public void Hide()
         {
-            ResetZoomFactor(pointer);
+            ResetZoomFactor();
             this.Visibility = Visibility.Collapsed;
         }
 
@@ -101,21 +114,26 @@ namespace WJX.UWP.Controls
         {
             double height = _img.ActualHeight;
             double width = _img.ActualWidth;
+
+            // 如果宽度小于560，则将图片调整为适应屏幕
+            double imageSizeFactor = this.ActualWidth >= 560 ? this.ImageSizePercent : 1;
+
             if (height >= width)
             {
-                _img.Height = this.ImageSizePercent * this.ActualHeight;
+                _img.Height = imageSizeFactor * this.ActualHeight;
+                _img.Width = _img.Height * width / height;
             }
             else
             {
-                _img.Width = this.ImageSizePercent * this.ActualWidth;
+                _img.Width = imageSizeFactor * this.ActualWidth;
+                _img.Height = _img.Width * height  / width;
             }
-
         }
 
         /// <summary>
         /// 重置缩放倍率
         /// </summary>
-        private void ResetZoomFactor(PointerDeviceType pointer)
+        private void ResetZoomFactor()
         {
             if (_zoom != null)
             {
